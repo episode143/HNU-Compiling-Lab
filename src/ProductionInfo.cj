@@ -1,8 +1,8 @@
 package lab2
 public class ProductionInfo{
-    let indexId:Int64
-    let headName:String
-    let bodySize:Int64
+    public var indexId:Int64
+    public var headName:String
+    public var bodySize:Int64
     public init(indexId:Int64 ,headName:String ,bodySize:Int64) {
         this.indexId = indexId;
         this.headName = headName;

@@ -2,13 +2,15 @@ package lab2
 import std.collection.*
 public class NonTerminalSymbol<:GrammarSymbol & Hashable & Equatable<NonTerminalSymbol>{
     // 有关非终结符构成的产生式
-    let pProductionTable:ArrayList<Production>
+    public var pProductionTable:ArrayList<Production>
     // 产生式的个数
-    let numOfProduction:Int64
-    let pFirstSet:HashSet<TerminalSymbol>
-    let pFollowSet:HashSet<TerminalSymbol>
+    public var numOfProduction:Int64
+    // 非终结符的FIRST函数值
+    public var pFirstSet:HashSet<TerminalSymbol>
+    // 非终结符的FOLLOW的函数值
+    public var pFollowSet:HashSet<TerminalSymbol>
     // 求follow的时候存放所依赖的非终结符
-    let pDependentSetInFollow:HashSet<NonTerminalSymbol>
+    public var pDependentSetInFollow:HashSet<NonTerminalSymbol>
     public init(name:String,symbolType:String ,pProductionTable:ArrayList<Production> ,numOfProduction:Int64 ,pFirstSet:HashSet<TerminalSymbol>,pFollowSet:HashSet<TerminalSymbol>,pDependentSetInFollow:HashSet<NonTerminalSymbol>){
         super(name,symbolType);
         this.pProductionTable = pProductionTable;

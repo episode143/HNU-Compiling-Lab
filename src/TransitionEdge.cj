@@ -1,8 +1,8 @@
 package lab2
 public class TransitionEdge{
-    let driverSymbol:GrammarSymbol
-    let fromItemSet:ItemSet
-    let toItemSet:ItemSet
+    public var driverSymbol:GrammarSymbol
+    public var fromItemSet:ItemSet
+    public var toItemSet:ItemSet
     public init(driverSymbol:GrammarSymbol ,fromItemSet:ItemSet ,toItemSet:ItemSet) {
         // 在给driverSymbol赋值的时候要强制类型转换
         this.driverSymbol = driverSymbol;
