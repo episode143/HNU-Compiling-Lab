@@ -1,0 +1,23 @@
+{
+  "resolves": [
+    {
+      "rootPackageName": "lab2",
+      "modulePath": ".",
+      "packagePath": "D:\\Cangjie\\cc\\lab2\\src",
+      "fullName": "lab2",
+      "isMacroPackage": false,
+      "output-type": "executable",
+      "compile-option": "",
+      "native-compile-option": "",
+      "customized-option": {},
+      "link-option": "",
+      "native-link-option": "",
+      "requires": [],
+      "c_libs": {},
+      "isTestPkg": false,
+      "accessLevel": "public"
+    }
+  ],
+  "binDeps": {},
+  "crossBinDeps": {}
+}

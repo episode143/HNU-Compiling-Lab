@@ -1,0 +1,4 @@
+//忽略vscode
+.vscode/
+//忽略cache
+.cache/
