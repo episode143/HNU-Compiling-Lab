@@ -1,5 +1,17 @@
 package lab2
 import std.collection.*
+// 三种枚举类
+public var non_s:String = "NONTERMINAL";
+public var ter_s:String = "TERMINAL";
+public var null_s:String = "NULL";
+// 创建终结符null
+public var name_null:String = "null";
+public var lexeme_null:String = "null";
+public var ts_null = TerminalSymbol(name_null,null_s,lexeme_null);
+// 当option为NONE的时候返回的值
+public var none_s:String = "NONE";
+public var none_NonTerminalSymbol:NonTerminalSymbol = NonTerminalSymbol(none_s,none_s);
+public var none_TerminalSymbol:TerminalSymbol = TerminalSymbol(none_s,none_s,none_s);
 // 所有的非终结符集合
 public var all_NonTerminalSymbol_Set:ArrayList<NonTerminalSymbol> = ArrayList<NonTerminalSymbol>();
 // 展示所有非终结符以及其产生式集合
@@ -19,22 +31,106 @@ public func show_all_nts_production(){
 public var all_Production_Set:ArrayList<Production> = ArrayList<Production>();
 
 // 产生式的FIRST函数求解
-public func getFirst(production:Production):ArrayList<GrammarSymbol> {
-    var res = ArrayList<GrammarSymbol>();
-    return res;
+public func getFirst(production:Production) {
+    var nullStand:Bool = true;
+    var i:Int64 = 0;
+    while(nullStand && i<production.pBodySymbolTable.size) {
+        var currGrammarSymbol:GrammarSymbol = production.pBodySymbolTable[i];
+        // 如果是终结符
+        if(currGrammarSymbol is TerminalSymbol) {
+            nullStand = false;
+            var insert_Symbol:TerminalSymbol = currGrammarSymbol as TerminalSymbol ?? none_TerminalSymbol;
+            if(insert_Symbol.name != "NONE") {
+                production.pFirstSet.put(insert_Symbol);
+            }
+        } else {
+            var insert_Symbol:NonTerminalSymbol = currGrammarSymbol as NonTerminalSymbol ?? none_NonTerminalSymbol;
+            if(insert_Symbol.name != "NONE") {
+                production.pFirstSet.putAll(insert_Symbol.pFirstSet);
+                production.pFirstSet.remove(ts_null);
+                if(!insert_Symbol.pFirstSet.contains(ts_null)) {
+                    nullStand = false;
+                }
+            }
+        }
+    }
+    if(nullStand && i == production.pBodySymbolTable.size) {
+        production.pFirstSet.put(ts_null);
+    }
 }
-
-// 先求出所有的非终结符的FIRST即可
+// 展示所有产生式的FIRST
+public func show_Production_FIRST(){
+    for(production in all_Production_Set) {
+        getFirst(production);
+        print("PRODUCTION: ");
+        for(grammar in production.pBodySymbolTable) {
+            print("${grammar.name} ");
+        }
+        println();
+        print("FIRST: ");
+        for(ts in production.pFirstSet) {
+            print("${ts.name} ");
+        }
+        println();
+    }
+}
+// 求出所有的非终结符的FIRST
 public func getFirst(){
-    
+    var task_table:HashMap<NonTerminalSymbol, HashSet<NonTerminalSymbol>> = HashMap<NonTerminalSymbol, HashSet<NonTerminalSymbol>>();
+    for(nfs in all_NonTerminalSymbol_Set) {
+        task_table.put(nfs,HashSet<NonTerminalSymbol>());
+    }
+    // 已经得到其FIRST函数的nts
+    var accomplish_set:HashSet<NonTerminalSymbol> = HashSet<NonTerminalSymbol>();
+    while(accomplish_set.size != all_NonTerminalSymbol_Set.size) {
+        for(nts in all_NonTerminalSymbol_Set) {
+            // 是否独立(无未计算出的FIRST依赖)
+            var independent = true;
+            for(production in nts.pProductionTable) {
+                // 找到产生式第一个grammar
+                var grammarSymbol:GrammarSymbol = production.pBodySymbolTable[0];
+                if(grammarSymbol is NonTerminalSymbol) {
+                    //println("nfs!!!!");
+                    var insert_nts:NonTerminalSymbol = grammarSymbol as NonTerminalSymbol ?? none_NonTerminalSymbol;
+                    if(insert_nts.name != "NONE") {
+                        //println("${insert_nts.name}")
+                        // 如果这个非终结符已经有FIRST函数
+                        if(accomplish_set.contains(insert_nts)) {
+                            nts.pFirstSet.putAll(insert_nts.pFirstSet);
+                            task_table[nts].remove(insert_nts);
+                        } else {
+                            task_table[nts].put(insert_nts);
+                            independent = false;
+                        }
+                    }
+                } else {
+                    //println("FS!!")
+                    var insert_ts:TerminalSymbol = grammarSymbol as TerminalSymbol ?? none_TerminalSymbol;
+                    if(insert_ts.name != "NONE") {
+                        nts.pFirstSet.put(insert_ts);
+                    }
+                }
+            }
+            if(independent) {
+                accomplish_set.put(nts);
+                //println("accomplish: ${nts.name}");
+            }
+        }
+    }
 }
-
+// 展示所有非终结符的FIRST函数
+public func show_NFS_FIRST(){
+    for(nfs in all_NonTerminalSymbol_Set) {
+        print("name: ${nfs.name} FIRST: {");
+        for(ts in nfs.pFirstSet) {
+            print(" ${ts.name} ");
+        }
+        println("}");
+    }
+}
 // 创建测试样例
 public func test(){
 
-    var non_s:String = "NONTERMINAL";
-    var ter_s:String = "TERMINAL";
-    var null_s:String = "NULL";
     // 创建非终结符E
     var name_E:String = "E";
     var pProductionTable_E = ArrayList<Production>();
@@ -110,10 +206,6 @@ public func test(){
     var lexeme_id:String = "ID";
     var ts_id = TerminalSymbol(name_id,ter_s,lexeme_id);
 
-    // 创建终结符null
-    var name_null:String = "null";
-    var lexeme_null:String = "null";
-    var ts_null = TerminalSymbol(name_null,null_s,lexeme_null);
 
     // 创建产生式 E->T E'
     var production_1_id:Int64 = 1;

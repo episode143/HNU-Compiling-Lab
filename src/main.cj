@@ -15,6 +15,9 @@ public var pProductionInfoTable:ArrayList<ProductionInfo> = ArrayList<Production
 
 main(): Int64 {
     test();
-    show_all_nts_production();
+    //show_all_nts_production();
+    getFirst();
+    show_NFS_FIRST();
+    show_Production_FIRST();
     return 0
 }

@@ -19,6 +19,14 @@ public class NonTerminalSymbol<:GrammarSymbol & Hashable & Equatable<NonTerminal
         this.pFollowSet = pFollowSet;
         this.pDependentSetInFollow = pDependentSetInFollow;
     }
+    public init(name:String,symbolType:String){
+        super(name,symbolType);
+        this.pProductionTable = ArrayList<Production>();
+        this.numOfProduction = 0;
+        this.pFirstSet = HashSet<TerminalSymbol>();
+        this.pFollowSet = HashSet<TerminalSymbol>();
+        this.pDependentSetInFollow = HashSet<NonTerminalSymbol>();
+    }
     // 非终结符的name即为其hashcode
     public func hashCode():Int64 {
         return this.name.hashCode();
