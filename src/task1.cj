@@ -14,6 +14,8 @@ public var none_NonTerminalSymbol:NonTerminalSymbol = NonTerminalSymbol(none_s,n
 public var none_TerminalSymbol:TerminalSymbol = TerminalSymbol(none_s,none_s,none_s);
 // 所有的非终结符集合
 public var all_NonTerminalSymbol_Set:ArrayList<NonTerminalSymbol> = ArrayList<NonTerminalSymbol>();
+// 所有的产生式集合
+public var all_Production_Set:ArrayList<Production> = ArrayList<Production>();
 // 展示所有非终结符以及其产生式集合
 public func show_all_nts_production(){
     for(nts in all_NonTerminalSymbol_Set) {
@@ -27,11 +29,8 @@ public func show_all_nts_production(){
         }
     }
 }
-// 所有的产生式集合
-public var all_Production_Set:ArrayList<Production> = ArrayList<Production>();
-
 // 产生式的FIRST函数求解
-public func getFirst(production:Production) {
+public func get_NFS_FIRST(production:Production) {
     var nullStand:Bool = true;
     var i:Int64 = 0;
     while(nullStand && i<production.pBodySymbolTable.size) {
@@ -61,7 +60,7 @@ public func getFirst(production:Production) {
 // 展示所有产生式的FIRST
 public func show_Production_FIRST(){
     for(production in all_Production_Set) {
-        getFirst(production);
+        get_NFS_FIRST(production);
         print("PRODUCTION: ");
         for(grammar in production.pBodySymbolTable) {
             print("${grammar.name} ");
@@ -75,7 +74,7 @@ public func show_Production_FIRST(){
     }
 }
 // 求出所有的非终结符的FIRST
-public func getFirst(){
+public func get_NFS_FIRST(){
     var task_table:HashMap<NonTerminalSymbol, HashSet<NonTerminalSymbol>> = HashMap<NonTerminalSymbol, HashSet<NonTerminalSymbol>>();
     for(nfs in all_NonTerminalSymbol_Set) {
         task_table.put(nfs,HashSet<NonTerminalSymbol>());
@@ -118,6 +117,18 @@ public func getFirst(){
         }
     }
 }
+
+public func FIRST(grammerSymbol:GrammarSymbol):HashSet<TerminalSymbol> {
+    if(grammerSymbol is NonTerminalSymbol) {
+        var temp_nts:NonTerminalSymbol = grammerSymbol as NonTerminalSymbol ?? none_NonTerminalSymbol;
+        return temp_nts.pFirstSet;
+    } else {
+        var temp_ts:TerminalSymbol = grammerSymbol as TerminalSymbol ?? none_TerminalSymbol;
+        var res_set:HashSet<TerminalSymbol> = HashSet<TerminalSymbol>();
+        res_set.put(temp_ts);
+        return res_set;
+    }
+}
 // 展示所有非终结符的FIRST函数
 public func show_NFS_FIRST(){
     for(nfs in all_NonTerminalSymbol_Set) {
@@ -126,6 +137,75 @@ public func show_NFS_FIRST(){
             print(" ${ts.name} ");
         }
         println("}");
+    }
+}
+public func get_NFS_FOLLOW(){
+    // 仅仅使用FIRST得到部分以及依赖的FOLLOW
+    for(nts in all_NonTerminalSymbol_Set) {
+        for(production in nts.pProductionTable) {
+            var i:Int64 = production.pBodySymbolTable.size - 1;
+            var grammerSymbol:GrammarSymbol = production.pBodySymbolTable[i];
+            if(grammerSymbol is NonTerminalSymbol) {
+                var temp_nts = grammerSymbol as NonTerminalSymbol ?? none_NonTerminalSymbol;
+                if(temp_nts.name != "NONE") {
+                    temp_nts.pDependentSetInFollow.put(nts);
+                }
+            }
+            var nullStand:Bool = true;
+            var j:Int64 = production.pBodySymbolTable.size-1;
+            i = i-1;
+            while(i>=0) {
+                var curr_gs:GrammarSymbol = production.pBodySymbolTable[i];
+                if(curr_gs is NonTerminalSymbol) {
+                    var temp_nts = curr_gs as NonTerminalSymbol ?? none_NonTerminalSymbol;
+                    if(temp_nts.name != "NONE") {
+                        var k:Int64 = i+1;
+                        while(k<=j) {
+                            var insert_k_gs:GrammarSymbol = production.pBodySymbolTable[k];
+                            temp_nts.pFollowSet.putAll(FIRST(insert_k_gs));
+                            temp_nts.pFollowSet.remove(ts_null);
+                            k++;
+                        }
+                        if(!temp_nts.pFirstSet.contains(ts_null)) {
+                            j = i;
+                        }
+                        if(nullStand && !FIRST(production.pBodySymbolTable[i+1]).contains(ts_null)) {
+                            nullStand = false;
+                        }
+                        if(nullStand) {
+                            temp_nts.pDependentSetInFollow.put(nts);
+                        }
+                    }
+                } else {
+                    j = i;
+                    if(nullStand) {
+                        nullStand = false;
+                    }
+                }
+                i--;
+            }
+        }
+    }
+    // 先找出所有不需要依赖的非终结符
+    var accomplish_follow_nts:HashSet<NonTerminalSymbol> = HashSet<NonTerminalSymbol>();
+    for(nts in all_NonTerminalSymbol_Set) {
+        if(nts.pDependentSetInFollow.isEmpty()) {
+            accomplish_follow_nts.put(nts);
+        }
+    }
+    // 通过不需要依赖的终结符持续处理直到所有FOLLOW都完成
+    while(accomplish_follow_nts.size != all_NonTerminalSymbol_Set.size) {
+        for(nts in all_NonTerminalSymbol_Set) {
+            for(dependence in nts.pDependentSetInFollow) {
+                if(accomplish_follow_nts.contains(dependence)) {
+                    nts.pFollowSet.putAll(dependence.pFollowSet);
+                    nts.pDependentSetInFollow.remove(nts);
+                    if(nts.pDependentSetInFollow.isEmpty()) {
+                        accomplish_follow_nts.put(nts);
+                    }
+                }
+            }
+        }
     }
 }
 // 创建测试样例
