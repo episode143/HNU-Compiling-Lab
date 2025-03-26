@@ -226,8 +226,8 @@ public func show_NFS_FOLLOW() {
         println("}");
     }
 }
-// 创建测试样例
-public func test(){
+// 创建测试样例 文法3.5
+public func test1(){
 
     // 创建非终结符E
     var name_E:String = "E";

@@ -14,13 +14,17 @@ public var pGOTOCellTable:ArrayList<GotoCell> = ArrayList<GotoCell>();
 public var pProductionInfoTable:ArrayList<ProductionInfo> = ArrayList<ProductionInfo>();
 
 main(): Int64 {
-    test();
+    test2();
+    test2_1();
+    //show_all_nts_production();
+    return 0
+}
+public func testTask1(){
+    test1();
     //show_all_nts_production();
     get_NFS_FIRST();
     show_NFS_FIRST();
     show_Production_FIRST();
     get_NFS_FOLLOW();
-    // 这是没算上结束符号$
     show_NFS_FOLLOW();
-    return 0
 }
