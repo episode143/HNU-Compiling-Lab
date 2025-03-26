@@ -18,7 +18,6 @@ public var pProductionInfoTable:ArrayList<ProductionInfo> = ArrayList<Production
 main(): Int64 {
     test2();
     test2_1();
-    //show_all_nts_production();
     return 0
 }
 public func testTask1(){
@@ -26,6 +25,7 @@ public func testTask1(){
     //show_all_nts_production();
     get_NFS_FIRST();
     show_NFS_FIRST();
+    get_All_Production_FIRST();
     show_Production_FIRST();
     get_NFS_FOLLOW();
     show_NFS_FOLLOW();

@@ -57,10 +57,15 @@ public func get_Production_FIRST(production:Production) {
         production.pFirstSet.put(ts_null);
     }
 }
+// 求解所有产生式的FIRST
+public func get_All_Production_FIRST(){
+    for(production in all_Production_Set) {
+        get_Production_FIRST(production);
+    }
+}
 // 展示所有产生式的FIRST
 public func show_Production_FIRST(){
     for(production in all_Production_Set) {
-        get_Production_FIRST(production);
         print("PRODUCTION: ");
         for(grammar in production.pBodySymbolTable) {
             print("${grammar.name} ");

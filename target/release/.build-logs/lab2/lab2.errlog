@@ -1,0 +1,9 @@
+[33mwarning[0m: unused variable:'drive_ts_set'
+   [36m==>[0m D:\Cangjie\cc\lab2\src\task2.cj:375:13:
+    [36m| [0m
+[36m375[0m [36m| [0m        var drive_ts_set:HashSet<TerminalSymbol> = HashSet<TerminalSymbol>();[0m
+    [36m| [0m            [33m^^^^^^^^^^^^ unused variable[0m
+    [36m| [0m
+    [36m#[0m [0mnote[0m: this warning can be suppressed by setting the compiler option `-Woff unused`
+
+1 warning generated, 1 warning printed.

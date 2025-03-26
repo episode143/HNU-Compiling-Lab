@@ -165,6 +165,14 @@ public func test2(){
     nts_F.pProductionTable.append(production_6);
     nts_F.numOfProduction = 2;
     all_Production_Set.append(production_6);
+    // // 先求解出所有非终结符的FIRST
+    // get_NFS_FIRST();
+    // // 再求解出所有产生式的FIRST
+    // get_All_Production_FIRST();
+    // 求出所有非终结符的FOLLOW
+    get_NFS_FOLLOW();
+    // 展示所有非终结符的FOLLOW
+    show_NFS_FOLLOW();
 }
 // 针对第二题的第一小题测试样例
 public func test2_1(){
@@ -180,6 +188,9 @@ public func test2_1(){
     getClosure(I0);
     show_ItemSet(I0);
     exhaustTransition(I0);
+    //show_All_itemSet();
+}
+public func show_All_itemSet(){
     for(iS in pItemSetTable) {
         println("L${iS.stateId} :")
         show_ItemSet(iS);
@@ -353,5 +364,14 @@ public func contains(itemSet:ItemSet):Bool {
             return true;
         }
     }
+    return false;
+}
+public func test2_4(){
+
+}
+// 判断文法是否为SLR(1)文法
+public func judge_SLR1():Bool {
+
+
     return false;
 }
