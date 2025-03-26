@@ -1,6 +1,6 @@
 package lab2 
 import std.collection.*
-public class Production{
+public class Production<:Equatable<Production>{
     // 产生式编号
     public var productionId:Int64
     // 产生式体中包含文法符的个数
@@ -14,5 +14,11 @@ public class Production{
         this.bodySize = bodySize;
         this.pBodySymbolTable = pBodySymbolTable;
         this.pFirstSet = pFirstSet;
+    }
+    public operator func==(another:Production) {
+        return this.productionId == another.productionId;
+    }
+    public operator func!=(another:Production) {
+        return this.productionId == another.productionId;
     }
 }
