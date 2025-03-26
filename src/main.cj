@@ -6,6 +6,8 @@ import std.collection.*
 public var pParseTableOfLL:ArrayList<ArrayList<Cell>> = ArrayList<ArrayList<Cell>>();
 // 构建LR文法的DFA时，将所有的项集放在一个表中
 public var pItemSetTable:ArrayList<ItemSet> = ArrayList<ItemSet>();
+// 构建LR文法的DFA的时候，将所有的边放在一个表中
+public var pTransitionEdgeTable:ArrayList<TransitionEdge> = ArrayList<TransitionEdge>();
 // LR语法分析表的ACTION部分
 public var pActionCellTable:ArrayList<ActionCell> = ArrayList<ActionCell>();
 // LR语法分析表的GOTO部分

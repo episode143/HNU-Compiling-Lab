@@ -271,74 +271,82 @@ public func show_ItemSet(itemSet: ItemSet) {
         }
     }
 }
-// LR(0)项集的变迁：穷举出边 ok  后继项集核心项确定以及创建  ok  后继项集是否为新项集 为项集实现equatiable
-public func exhaustTransition(itemSet:ItemSet) {
-    var drive_NTS:HashSet<NonTerminalSymbol> = HashSet<NonTerminalSymbol>();
-    var drive_TS:HashSet<TerminalSymbol> = HashSet<TerminalSymbol>();
-    // 收集驱动文法符
-    for(item in itemSet.pItemTable) {
-        // 必须是没有到最后
-        if(item.dotPosition < item.production.pBodySymbolTable.size) {
-            var curr_symbol:GrammarSymbol = item.production.pBodySymbolTable[item.dotPosition];
-            if(curr_symbol is NonTerminalSymbol) {
-                var curr_nts:NonTerminalSymbol = curr_symbol as NonTerminalSymbol ?? none_NonTerminalSymbol;
-                if(curr_nts != none_NonTerminalSymbol) {
-                    drive_NTS.put(curr_nts);
-                }
-            } else {
-                var curr_ts:TerminalSymbol = curr_symbol as TerminalSymbol ?? none_TerminalSymbol;
-                if(curr_ts != none_TerminalSymbol) {
-                    drive_TS.put(curr_ts);
-                }
-            }
-        }
-    }
-    println("OKO");
-    // 针对非终结符来穷举下一项集
-    for(nts in drive_NTS) {
-        // 创建新的项集
-        var Inew:ItemSet = ItemSet(pItemSetTable.size,ArrayList<LR0Item>());
+// LR(0)项集的变迁：穷举出边 ok  后继项集核心项确定以及创建  ok  后继项集是否为新项集 为项集实现equatiable  从L0开始生成整个DFA
+public func exhaustTransition(itemSet0:ItemSet) {
+    var transition_queue:ArrayList<ItemSet> = ArrayList<ItemSet>();
+    transition_queue.append(itemSet0);
+    while(!transition_queue.isEmpty()){
+        var itemSet = transition_queue[0];
+        transition_queue.remove(0);
+        var drive_NTS:HashSet<NonTerminalSymbol> = HashSet<NonTerminalSymbol>();
+        var drive_TS:HashSet<TerminalSymbol> = HashSet<TerminalSymbol>();
+        // 收集驱动文法符
         for(item in itemSet.pItemTable) {
+            // 必须是没有到最后
             if(item.dotPosition < item.production.pBodySymbolTable.size) {
-                var curr_Symbol:GrammarSymbol = item.production.pBodySymbolTable[item.dotPosition];
-                if(curr_Symbol is NonTerminalSymbol) {
-                    var curr_Nts:NonTerminalSymbol = curr_Symbol as NonTerminalSymbol ?? none_NonTerminalSymbol;
-                    if(curr_Nts != none_NonTerminalSymbol && curr_Nts == nts) {
-                        var new_item:LR0Item = LR0Item(item.nonTerminalSymbol,item.production,item.dotPosition+1,"CORE");
-                        Inew.pItemTable.append(new_item);
+                var curr_symbol:GrammarSymbol = item.production.pBodySymbolTable[item.dotPosition];
+                if(curr_symbol is NonTerminalSymbol) {
+                    var curr_nts:NonTerminalSymbol = curr_symbol as NonTerminalSymbol ?? none_NonTerminalSymbol;
+                    if(curr_nts != none_NonTerminalSymbol) {
+                        drive_NTS.put(curr_nts);
+                    }
+                } else {
+                    var curr_ts:TerminalSymbol = curr_symbol as TerminalSymbol ?? none_TerminalSymbol;
+                    if(curr_ts != none_TerminalSymbol) {
+                        drive_TS.put(curr_ts);
                     }
                 }
             }
         }
-        if(!contains(Inew)) {
-            getClosure(Inew);
-            pItemSetTable.append(Inew);
-        }
-    }
-    println("OKOOKOO");
-    // 针对终结符来穷举下一项集
-    for(ts in drive_TS) {
-        // 创建新的项集
-        var Inew:ItemSet = ItemSet(pItemSetTable.size,ArrayList<LR0Item>());
-        for(item in itemSet.pItemTable) {
-            if(item.dotPosition < item.production.pBodySymbolTable.size) {
-                var curr_Symbol:GrammarSymbol = item.production.pBodySymbolTable[item.dotPosition];
-                if(curr_Symbol is TerminalSymbol) {
-                    var curr_Ts:TerminalSymbol = curr_Symbol as TerminalSymbol ?? none_TerminalSymbol;
-                    if(curr_Ts != none_TerminalSymbol && curr_Ts == ts) {
-                        var new_item:LR0Item = LR0Item(item.nonTerminalSymbol,item.production,item.dotPosition+1,"CORE");
-                        Inew.pItemTable.append(new_item);
+        // 针对非终结符来穷举下一项集
+        for(nts in drive_NTS) {
+            // 创建新的项集
+            var Inew:ItemSet = ItemSet(pItemSetTable.size,ArrayList<LR0Item>());
+            for(item in itemSet.pItemTable) {
+                if(item.dotPosition < item.production.pBodySymbolTable.size) {
+                    var curr_Symbol:GrammarSymbol = item.production.pBodySymbolTable[item.dotPosition];
+                    if(curr_Symbol is NonTerminalSymbol) {
+                        var curr_Nts:NonTerminalSymbol = curr_Symbol as NonTerminalSymbol ?? none_NonTerminalSymbol;
+                        if(curr_Nts != none_NonTerminalSymbol && curr_Nts == nts) {
+                            var new_item:LR0Item = LR0Item(item.nonTerminalSymbol,item.production,item.dotPosition+1,"CORE");
+                            Inew.pItemTable.append(new_item);
+                        }
                     }
                 }
             }
+            if(!contains(Inew)) {
+                pTransitionEdgeTable.append(TransitionEdge(nts,itemSet,Inew));
+                getClosure(Inew);
+                pItemSetTable.append(Inew);
+                transition_queue.append(Inew);
+            }
         }
-        if(!contains(Inew)) {
-            getClosure(Inew);
-            pItemSetTable.append(Inew);
-        }
+        // 针对终结符来穷举下一项集
+        for(ts in drive_TS) {
+            // 创建新的项集
+            var Inew:ItemSet = ItemSet(pItemSetTable.size,ArrayList<LR0Item>());
+            for(item in itemSet.pItemTable) {
+                if(item.dotPosition < item.production.pBodySymbolTable.size) {
+                    var curr_Symbol:GrammarSymbol = item.production.pBodySymbolTable[item.dotPosition];
+                    if(curr_Symbol is TerminalSymbol) {
+                        var curr_Ts:TerminalSymbol = curr_Symbol as TerminalSymbol ?? none_TerminalSymbol;
+                        if(curr_Ts != none_TerminalSymbol && curr_Ts == ts) {
+                            var new_item:LR0Item = LR0Item(item.nonTerminalSymbol,item.production,item.dotPosition+1,"CORE");
+                            Inew.pItemTable.append(new_item);
+                        }
+                    }
+                }
+            }
+            if(!contains(Inew)) {
+                pTransitionEdgeTable.append(TransitionEdge(ts,itemSet,Inew));
+                getClosure(Inew);
+                pItemSetTable.append(Inew);
+                transition_queue.append(Inew);
+            }
+        }        
     }
 }
-// 检查是否已经出现此项集
+// 检查项集是否已经出现
 public func contains(itemSet:ItemSet):Bool {
     for(iS in pItemSetTable) {
         if(iS == itemSet) {
