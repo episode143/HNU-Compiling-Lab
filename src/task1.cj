@@ -29,8 +29,8 @@ public func show_all_nts_production(){
         }
     }
 }
-// 产生式的FIRST函数求解
-public func get_NFS_FIRST(production:Production) {
+// 求解单个产生式的FIRST函数
+public func get_Production_FIRST(production:Production) {
     var nullStand:Bool = true;
     var i:Int64 = 0;
     while(nullStand && i<production.pBodySymbolTable.size) {
@@ -60,7 +60,7 @@ public func get_NFS_FIRST(production:Production) {
 // 展示所有产生式的FIRST
 public func show_Production_FIRST(){
     for(production in all_Production_Set) {
-        get_NFS_FIRST(production);
+        get_Production_FIRST(production);
         print("PRODUCTION: ");
         for(grammar in production.pBodySymbolTable) {
             print("${grammar.name} ");
@@ -89,11 +89,8 @@ public func get_NFS_FIRST(){
                 // 找到产生式第一个grammar
                 var grammarSymbol:GrammarSymbol = production.pBodySymbolTable[0];
                 if(grammarSymbol is NonTerminalSymbol) {
-                    //println("nfs!!!!");
                     var insert_nts:NonTerminalSymbol = grammarSymbol as NonTerminalSymbol ?? none_NonTerminalSymbol;
                     if(insert_nts.name != "NONE") {
-                        //println("${insert_nts.name}")
-                        // 如果这个非终结符已经有FIRST函数
                         if(accomplish_set.contains(insert_nts)) {
                             nts.pFirstSet.putAll(insert_nts.pFirstSet);
                             task_table[nts].remove(insert_nts);
@@ -103,7 +100,6 @@ public func get_NFS_FIRST(){
                         }
                     }
                 } else {
-                    //println("FS!!")
                     var insert_ts:TerminalSymbol = grammarSymbol as TerminalSymbol ?? none_TerminalSymbol;
                     if(insert_ts.name != "NONE") {
                         nts.pFirstSet.put(insert_ts);
@@ -112,21 +108,8 @@ public func get_NFS_FIRST(){
             }
             if(independent) {
                 accomplish_set.put(nts);
-                //println("accomplish: ${nts.name}");
             }
         }
-    }
-}
-
-public func FIRST(grammerSymbol:GrammarSymbol):HashSet<TerminalSymbol> {
-    if(grammerSymbol is NonTerminalSymbol) {
-        var temp_nts:NonTerminalSymbol = grammerSymbol as NonTerminalSymbol ?? none_NonTerminalSymbol;
-        return temp_nts.pFirstSet;
-    } else {
-        var temp_ts:TerminalSymbol = grammerSymbol as TerminalSymbol ?? none_TerminalSymbol;
-        var res_set:HashSet<TerminalSymbol> = HashSet<TerminalSymbol>();
-        res_set.put(temp_ts);
-        return res_set;
     }
 }
 // 展示所有非终结符的FIRST函数
@@ -139,6 +122,19 @@ public func show_NFS_FIRST(){
         println("}");
     }
 }
+// 求解FOLLOW函数中需要的辅助FIRST（包含终结符的FIRST即为它本身）
+public func FIRST(grammerSymbol:GrammarSymbol):HashSet<TerminalSymbol> {
+    if(grammerSymbol is NonTerminalSymbol) {
+        var temp_nts:NonTerminalSymbol = grammerSymbol as NonTerminalSymbol ?? none_NonTerminalSymbol;
+        return temp_nts.pFirstSet;
+    } else {
+        var temp_ts:TerminalSymbol = grammerSymbol as TerminalSymbol ?? none_TerminalSymbol;
+        var res_set:HashSet<TerminalSymbol> = HashSet<TerminalSymbol>();
+        res_set.put(temp_ts);
+        return res_set;
+    }
+}
+// 求出所有非终结符的FOLLOW函数
 public func get_NFS_FOLLOW(){
     // 仅仅使用FIRST得到部分以及依赖的FOLLOW
     for(nts in all_NonTerminalSymbol_Set) {
@@ -148,7 +144,10 @@ public func get_NFS_FOLLOW(){
             if(grammerSymbol is NonTerminalSymbol) {
                 var temp_nts = grammerSymbol as NonTerminalSymbol ?? none_NonTerminalSymbol;
                 if(temp_nts.name != "NONE") {
-                    temp_nts.pDependentSetInFollow.put(nts);
+                    // FOLLOW求解不可依赖自己
+                    if(temp_nts != nts){
+                        temp_nts.pDependentSetInFollow.put(nts);
+                    }
                 }
             }
             var nullStand:Bool = true;
@@ -172,7 +171,8 @@ public func get_NFS_FOLLOW(){
                         if(nullStand && !FIRST(production.pBodySymbolTable[i+1]).contains(ts_null)) {
                             nullStand = false;
                         }
-                        if(nullStand) {
+                        // 注意不能依赖自己
+                        if(nullStand && temp_nts != nts) {
                             temp_nts.pDependentSetInFollow.put(nts);
                         }
                     }
@@ -186,26 +186,44 @@ public func get_NFS_FOLLOW(){
             }
         }
     }
-    // 先找出所有不需要依赖的非终结符
-    var accomplish_follow_nts:HashSet<NonTerminalSymbol> = HashSet<NonTerminalSymbol>();
+
+    // 复制一遍dependence
+    var dependence_map:HashMap<NonTerminalSymbol, HashSet<NonTerminalSymbol>> = HashMap<NonTerminalSymbol, HashSet<NonTerminalSymbol>>();
+    for(nts in all_NonTerminalSymbol_Set) {
+        dependence_map.put(nts,HashSet<NonTerminalSymbol>());
+        dependence_map[nts].putAll(nts.pDependentSetInFollow);
+    }
+    // 初始化已完成的nts集合
+    var accomplishment:HashSet<NonTerminalSymbol> = HashSet<NonTerminalSymbol>();
     for(nts in all_NonTerminalSymbol_Set) {
         if(nts.pDependentSetInFollow.isEmpty()) {
-            accomplish_follow_nts.put(nts);
+            accomplishment.put(nts);
         }
     }
-    // 通过不需要依赖的终结符持续处理直到所有FOLLOW都完成
-    while(accomplish_follow_nts.size != all_NonTerminalSymbol_Set.size) {
+    // 根据依赖FOLLOW来求解所有的非终结符的FOLLOW
+    while(accomplishment.size != all_NonTerminalSymbol_Set.size) {
         for(nts in all_NonTerminalSymbol_Set) {
-            for(dependence in nts.pDependentSetInFollow) {
-                if(accomplish_follow_nts.contains(dependence)) {
+            for(dependence in dependence_map[nts]) {
+                if(accomplishment.contains(dependence)) {
                     nts.pFollowSet.putAll(dependence.pFollowSet);
-                    nts.pDependentSetInFollow.remove(nts);
-                    if(nts.pDependentSetInFollow.isEmpty()) {
-                        accomplish_follow_nts.put(nts);
-                    }
                 }
             }
+            dependence_map[nts].removeAll(accomplishment);
+            if(dependence_map[nts].isEmpty()) {
+                accomplishment.put(nts);
+            }
         }
+    }
+
+}
+// 展示所有非终结符的FOLLOW函数
+public func show_NFS_FOLLOW() {
+    for(nts in all_NonTerminalSymbol_Set) {
+        print("name: ${nts.name} FOLLOW: {");
+        for(follow_symbol in nts.pFollowSet) {
+            print(" ${follow_symbol.name} ");
+        }
+        println("}");
     }
 }
 // 创建测试样例
@@ -286,6 +304,12 @@ public func test(){
     var lexeme_id:String = "ID";
     var ts_id = TerminalSymbol(name_id,ter_s,lexeme_id);
 
+    // 创建终结符$
+    var name_shut:String = "$";
+    var lexeme_shut:String = "$";
+    var ts_shut = TerminalSymbol(name_shut,ter_s,lexeme_shut);
+    // 把结束符$是开始符的FOLLOW天然已知条件添加进去
+    nts_E.pFollowSet.put(ts_shut);
 
     // 创建产生式 E->T E'
     var production_1_id:Int64 = 1;

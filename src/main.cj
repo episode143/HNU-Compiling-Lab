@@ -19,5 +19,8 @@ main(): Int64 {
     get_NFS_FIRST();
     show_NFS_FIRST();
     show_Production_FIRST();
+    get_NFS_FOLLOW();
+    // 这是没算上结束符号$
+    show_NFS_FOLLOW();
     return 0
 }

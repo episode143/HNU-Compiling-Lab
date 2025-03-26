@@ -2,3 +2,5 @@
 .vscode/
 //忽略cache
 .cache/
+//忽略counter
+.VSCodeCounter/
