@@ -11,6 +11,7 @@ public func test2(){
     var pDependentSetInFollow_E1 = HashSet<NonTerminalSymbol>();
     var nts_E1:NonTerminalSymbol = NonTerminalSymbol(name_E1,non_s,pProductionTable_E1,numOfProduction_E1,pFirstSet_E1,pFollowSet_E1,pDependentSetInFollow_E1);
     all_NonTerminalSymbol_Set.append(nts_E1);
+    getNTS.put(name_E1,nts_E1);
 
     // 创建非终结符E
     var name_E:String = "E";
@@ -21,7 +22,7 @@ public func test2(){
     var pDependentSetInFollow_E = HashSet<NonTerminalSymbol>();
     var nts_E:NonTerminalSymbol = NonTerminalSymbol(name_E,non_s,pProductionTable_E,numOfProduction_E,pFirstSet_E,pFollowSet_E,pDependentSetInFollow_E);
     all_NonTerminalSymbol_Set.append(nts_E);
-
+    getNTS.put(name_E,nts_E);
 
     // 创建非终结符T
     var name_T:String = "T";
@@ -32,7 +33,7 @@ public func test2(){
     var pDependentSetInFollow_T = HashSet<NonTerminalSymbol>();
     var nts_T:NonTerminalSymbol = NonTerminalSymbol(name_T,non_s,pProductionTable_T,numOfProduction_T,pFirstSet_T,pFollowSet_T,pDependentSetInFollow_T);
     all_NonTerminalSymbol_Set.append(nts_T);
-
+    getNTS.put(name_T,nts_T);
 
     // 创建非终结符F
     var name_F:String = "F";
@@ -43,46 +44,55 @@ public func test2(){
     var pDependentSetInFollow_F = HashSet<NonTerminalSymbol>();
     var nts_F:NonTerminalSymbol = NonTerminalSymbol(name_F,non_s,pProductionTable_F,numOfProduction_F,pFirstSet_F,pFollowSet_F,pDependentSetInFollow_F);
     all_NonTerminalSymbol_Set.append(nts_F);
+    getNTS.put(name_F,nts_F);
 
     // 创建终结符+
     var name_plus:String = "+";
     var lexeme_plus:String = "OPERATOR+";
     var ts_plus = TerminalSymbol(name_plus,ter_s,lexeme_plus);
+    getTS.put(name_plus,ts_plus);
 
     // 创建终结符(
     var name_left_bracket:String ="(";
     var lexeme_left_bracket:String = "LEFT BRACKET";
     var ts_left_bracket = TerminalSymbol(name_left_bracket,ter_s,lexeme_left_bracket);
+    getTS.put(name_left_bracket,ts_left_bracket);
 
     // 创建终结符)
     var name_right_bracket:String =")";
     var lexeme_right_bracket:String = "RIGHT BRACKET";
     var ts_right_bracket = TerminalSymbol(name_right_bracket,ter_s,lexeme_right_bracket);
+    getTS.put(name_right_bracket,ts_right_bracket);
 
     // 创建终结符*
     var name_multiple:String ="*";
     var lexeme_multiple:String = "OPERATOR*";
     var ts_multiple = TerminalSymbol(name_multiple,ter_s,lexeme_multiple);
+    getTS.put(name_multiple,ts_multiple);
 
     // 创建终结符id
     var name_id:String = "id";
     var lexeme_id:String = "ID";
     var ts_id = TerminalSymbol(name_id,ter_s,lexeme_id);
+    getTS.put(name_id,ts_id);
 
     // 创建终结符$
     var name_shut:String = "$";
     var lexeme_shut:String = "$";
     var ts_shut = TerminalSymbol(name_shut,ter_s,lexeme_shut);
+    getTS.put(name_shut,ts_shut);
+
     // 把结束符$是开始符的FOLLOW天然已知条件添加进去
     nts_E.pFollowSet.put(ts_shut);
 
-    // 创建产生式 E'->E
+    // 创建产生式 E'->E $
     var production_0_id:Int64 = 0;
     var production_0_size:Int64 = 1;
     var production_0_sTable:ArrayList<GrammarSymbol> = ArrayList<GrammarSymbol>();
     var production_0_fSet:HashSet<TerminalSymbol> = HashSet<TerminalSymbol>();
     var production_0:Production = Production(production_0_id,production_0_size,production_0_sTable,production_0_fSet);
     production_0.pBodySymbolTable.append(nts_E);
+    production_0.pBodySymbolTable.append(ts_shut);
     // 将其添加进E的产生式中
     nts_E1.pProductionTable.append(production_0);
     nts_E1.numOfProduction = 1;
@@ -188,7 +198,7 @@ public func test2_1(){
     getClosure(I0);
     show_ItemSet(I0);
     exhaustTransition(I0);
-    //show_All_itemSet();
+    show_All_itemSet();
 }
 // 展示所有项集内容
 public func show_All_itemSet(){
@@ -327,11 +337,11 @@ public func exhaustTransition(itemSet0:ItemSet) {
                 }
             }
             if(!contains(Inew)) {
-                pTransitionEdgeTable.append(TransitionEdge(nts,itemSet,Inew));
                 getClosure(Inew);
                 pItemSetTable.append(Inew);
                 transition_queue.append(Inew);
             }
+            pTransitionEdgeTable.append(TransitionEdge(nts,itemSet,Inew));
         }
         // 针对终结符来穷举下一项集
         for(ts in drive_TS) {
@@ -350,11 +360,11 @@ public func exhaustTransition(itemSet0:ItemSet) {
                 }
             }
             if(!contains(Inew)) {
-                pTransitionEdgeTable.append(TransitionEdge(ts,itemSet,Inew));
                 getClosure(Inew);
                 pItemSetTable.append(Inew);
                 transition_queue.append(Inew);
             }
+            pTransitionEdgeTable.append(TransitionEdge(ts,itemSet,Inew));
         }        
     }
 }
@@ -362,13 +372,19 @@ public func exhaustTransition(itemSet0:ItemSet) {
 public func contains(itemSet:ItemSet):Bool {
     for(iS in pItemSetTable) {
         if(iS == itemSet) {
+            itemSet.stateId = iS.stateId;
             return true;
         }
     }
     return false;
 }
+// 针对第2题 第4问进行测试
 public func test2_4(){
-
+    var isSLR1:Bool = judge_SLR1();
+    if(isSLR1) {
+        println();
+        println("当前文法是SLR1文法");
+    }
 }
 // 判断文法是否为SLR(1)文法
 public func judge_SLR1():Bool {
@@ -432,4 +448,63 @@ public func judgeSetHasUnion(tsSet:ArrayList<HashSet<TerminalSymbol>>):Bool{
         i++;
     }
     return false;
+}
+// 针对第2题 第5问进行测试
+public func test2_5(){
+    create_LR1_Analysis_Table();
+    // for(edge in pTransitionEdgeTable) {
+    //     println("FROM: ${edge.fromItemSet.stateId} TO:${edge.toItemSet.stateId}  DRIVE:${edge.driverSymbol.name}");
+    // }
+    // 部分ACTION表测试
+    println("测试ACTION");
+    println("${pActionCellTable[pItemSetTable[1]][getTS["$"]].actionId}")
+    println("${pActionCellTable[pItemSetTable[1]][getTS["+"]].actionId}")
+    println();
+    println("测试GOTO")
+    // 部分GOTO表测试
+    println("${pGOTOCellTable[pItemSetTable[0]][getNTS["E"]].nextStateId}");
+    println("${pGOTOCellTable[pItemSetTable[0]][getNTS["T"]].nextStateId}");
+    println("${pGOTOCellTable[pItemSetTable[4]][getNTS["T"]].nextStateId}");
+    println();
+}
+// 填写LR语法分析表
+public func create_LR1_Analysis_Table(){
+    // 先创建表格
+    for(itemSet in pItemSetTable) {
+        pActionCellTable.put(itemSet,HashMap<TerminalSymbol, ActionCell>());
+        pGOTOCellTable.put(itemSet,HashMap<NonTerminalSymbol, GotoCell>());
+    }
+    // 状态转换可以通过遍历TransactionEdge来实现
+    for(edge in pTransitionEdgeTable) {
+        var currGS:GrammarSymbol = edge.driverSymbol;
+        // 若是终结符则存入ACTION
+        if(currGS is TerminalSymbol) {
+            var currTS:TerminalSymbol = currGS as TerminalSymbol ?? none_TerminalSymbol;
+            if(currTS != none_TerminalSymbol) {
+                var new_ac:ActionCell = ActionCell(edge.fromItemSet.stateId,edge.driverSymbol.name,"S",edge.toItemSet.stateId);
+                pActionCellTable[edge.fromItemSet].put(currTS,new_ac)
+            }
+        }
+        // 否则存入GOTO
+        else {
+            var currNTS:NonTerminalSymbol = currGS as NonTerminalSymbol ?? none_NonTerminalSymbol;
+            if(currNTS != none_NonTerminalSymbol) {
+                var new_gt:GotoCell = GotoCell(edge.fromItemSet.stateId,currNTS.name,edge.toItemSet.stateId);
+                pGOTOCellTable[edge.fromItemSet].put(currNTS,new_gt);
+            }
+        }
+    }
+    // 规约需要通过遍历ITEMSET中的规约项来实现
+    for(itemSet in pItemSetTable) {
+        for(item in itemSet.pItemTable) {
+            // 属于是规约项
+            if(item.dotPosition == item.production.pBodySymbolTable.size) {
+                var currHeadNTS:NonTerminalSymbol = item.nonTerminalSymbol;
+                for(ts in currHeadNTS.pFollowSet) {
+                    var new_ac:ActionCell = ActionCell(itemSet.stateId,ts.name,"r",item.production.productionId);
+                    pActionCellTable[itemSet].put(ts,new_ac);
+                }
+            }
+        }
+    }
 }

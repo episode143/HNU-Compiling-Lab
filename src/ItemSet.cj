@@ -1,6 +1,6 @@
 package lab2
 import std.collection.*
-public class ItemSet<:Equatable<ItemSet>{
+public class ItemSet<:Equatable<ItemSet> & Hashable{
     public var stateId:Int64
     public var pItemTable:ArrayList<LR0Item>
     public init(stateId:Int64 ,pItemTable:ArrayList<LR0Item>) {
@@ -71,5 +71,8 @@ public class ItemSet<:Equatable<ItemSet>{
             }
         }
         return false;
+    }
+    public func hashCode():Int64 {
+        return this.stateId;
     }
 }
