@@ -18,12 +18,10 @@ public var pGOTOCellTable:HashMap<ItemSet, HashMap<NonTerminalSymbol, GotoCell>>
 public var pProductionInfoTable:ArrayList<ProductionInfo> = ArrayList<ProductionInfo>();
 
 main(): Int64 {
-    test2();
-    test2_1();
-    test2_4();
-    test2_5();
+    create_follow_circle_case();
     return 0
 }
+// 测试第一题
 public func testTask1(){
     test1();
     //show_all_nts_production();
@@ -33,4 +31,11 @@ public func testTask1(){
     show_Production_FIRST();
     get_NFS_FOLLOW();
     show_NFS_FOLLOW();
+}
+// 测试第二题
+public func testTask2(){
+    test2();
+    test2_1();
+    test2_4();
+    test2_5();
 }

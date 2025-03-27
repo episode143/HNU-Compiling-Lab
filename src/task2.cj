@@ -175,10 +175,14 @@ public func test2(){
     nts_F.pProductionTable.append(production_6);
     nts_F.numOfProduction = 2;
     all_Production_Set.append(production_6);
-    // // 先求解出所有非终结符的FIRST
-    // get_NFS_FIRST();
-    // // 再求解出所有产生式的FIRST
-    // get_All_Production_FIRST();
+    // 先求解出所有非终结符的FIRST
+    get_NFS_FIRST();
+    // 展示所有终结符的FIRST
+    show_NFS_FIRST();
+    // 再求解出所有产生式的FIRST
+    get_All_Production_FIRST();
+    // 展示所有产生式的FIRST
+    show_Production_FIRST();
     // 求出所有非终结符的FOLLOW
     get_NFS_FOLLOW();
     // 展示所有非终结符的FOLLOW

@@ -95,13 +95,16 @@ public func get_NFS_FIRST(){
                 var grammarSymbol:GrammarSymbol = production.pBodySymbolTable[0];
                 if(grammarSymbol is NonTerminalSymbol) {
                     var insert_nts:NonTerminalSymbol = grammarSymbol as NonTerminalSymbol ?? none_NonTerminalSymbol;
-                    if(insert_nts.name != "NONE") {
+                    if(insert_nts != none_NonTerminalSymbol) {
                         if(accomplish_set.contains(insert_nts)) {
                             nts.pFirstSet.putAll(insert_nts.pFirstSet);
                             task_table[nts].remove(insert_nts);
                         } else {
-                            task_table[nts].put(insert_nts);
-                            independent = false;
+                            // 不能依赖本身
+                            if(insert_nts != nts) {
+                                task_table[nts].put(insert_nts);
+                                independent = false;
+                            }
                         }
                     }
                 } else {
@@ -192,11 +195,16 @@ public func get_NFS_FOLLOW(){
         }
     }
 
-    // 复制一遍dependence
+    // 复制一遍dependence  以及依赖的边数
+    var curr_dependence_edge_num:Int64 = 0;
+    var before_dependence_edge_num:Int64 = 0;
     var dependence_map:HashMap<NonTerminalSymbol, HashSet<NonTerminalSymbol>> = HashMap<NonTerminalSymbol, HashSet<NonTerminalSymbol>>();
     for(nts in all_NonTerminalSymbol_Set) {
         dependence_map.put(nts,HashSet<NonTerminalSymbol>());
         dependence_map[nts].putAll(nts.pDependentSetInFollow);
+        // 添加依赖边的数量
+        curr_dependence_edge_num += nts.pDependentSetInFollow.size;
+        before_dependence_edge_num +=nts.pDependentSetInFollow.size;
     }
     // 初始化已完成的nts集合
     var accomplishment:HashSet<NonTerminalSymbol> = HashSet<NonTerminalSymbol>();
@@ -211,6 +219,7 @@ public func get_NFS_FOLLOW(){
             for(dependence in dependence_map[nts]) {
                 if(accomplishment.contains(dependence)) {
                     nts.pFollowSet.putAll(dependence.pFollowSet);
+                    curr_dependence_edge_num --;
                 }
             }
             dependence_map[nts].removeAll(accomplishment);
@@ -218,8 +227,53 @@ public func get_NFS_FOLLOW(){
                 accomplishment.put(nts);
             }
         }
+        //println("减少了 ${before_dependence_edge_num-curr_dependence_edge_num} 条边")
+        // 如果依赖边的数量没有改变 说明存在环 此时选取其中任意一个彻底剜去
+        if(curr_dependence_edge_num == before_dependence_edge_num) {
+            //println("FOLLOW依赖中存在环");
+            // 先完全消解一个NTS
+            var deal_nts:NonTerminalSymbol = none_NonTerminalSymbol;
+            for(nts in all_NonTerminalSymbol_Set) {
+                if(!accomplishment.contains(nts)) {
+                    deal_nts = nts;
+                }
+            }
+            //println("当前剜去 ${deal_nts.name}");
+            // 在剩下的依赖中完全剜去deal_nts
+            if(deal_nts != none_NonTerminalSymbol) {
+                var has_show_nts:HashSet<NonTerminalSymbol> = HashSet<NonTerminalSymbol>();
+                var task_queue:ArrayList<NonTerminalSymbol> = ArrayList<NonTerminalSymbol>();
+                for(dependence in dependence_map[deal_nts]) {
+                    if(!has_show_nts.contains(dependence)) {
+                        task_queue.append(dependence);
+                        has_show_nts.put(dependence);
+                    }
+                }
+                while(!task_queue.isEmpty()) {
+                    // 取出队首
+                    var headNts:NonTerminalSymbol = task_queue[0];
+                    task_queue.remove(0);
+                    for(dependence in dependence_map[headNts]) {
+                        if(!has_show_nts.contains(dependence)) {
+                            task_queue.append(dependence);
+                            has_show_nts.put(dependence);
+                        }
+                    }
+                }
+                // ∪上所有出现的
+                for(cNTS in has_show_nts) {
+                    deal_nts.pFollowSet.putAll(cNTS.pFollowSet);
+                }
+                // 直接剜去deal_nts  accomplishment中添加deal_nts
+                accomplishment.put(deal_nts);
+                curr_dependence_edge_num -= dependence_map[deal_nts].size;
+                before_dependence_edge_num = curr_dependence_edge_num;
+                dependence_map[deal_nts].clear();
+            }
+        } else {
+            before_dependence_edge_num = curr_dependence_edge_num;
+        }
     }
-
 }
 // 展示所有非终结符的FOLLOW函数
 public func show_NFS_FOLLOW() {
