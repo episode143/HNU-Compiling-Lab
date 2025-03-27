@@ -190,6 +190,7 @@ public func test2_1(){
     exhaustTransition(I0);
     //show_All_itemSet();
 }
+// 展示所有项集内容
 public func show_All_itemSet(){
     for(iS in pItemSetTable) {
         println("L${iS.stateId} :")
@@ -371,7 +372,64 @@ public func test2_4(){
 }
 // 判断文法是否为SLR(1)文法
 public func judge_SLR1():Bool {
-
-
+    for(itemSet in pItemSetTable) {
+        var all_Set:ArrayList<HashSet<TerminalSymbol>> = ArrayList<HashSet<TerminalSymbol>>();
+        var drive_nt_set:HashSet<TerminalSymbol> = HashSet<TerminalSymbol>();
+        all_Set.append(drive_nt_set);
+        for(item in itemSet.pItemTable) {
+            // 可以移入项
+            if(item.dotPosition < item.production.pBodySymbolTable.size) {
+                var currSymbol:GrammarSymbol = item.production.pBodySymbolTable[item.dotPosition];
+                // 找终结符的集合
+                if(currSymbol is TerminalSymbol) {
+                    var currTs:TerminalSymbol = currSymbol as TerminalSymbol ?? none_TerminalSymbol;
+                    if(currTs != none_TerminalSymbol) {
+                        drive_nt_set.put(currTs);
+                    }
+                }
+            }
+            // 可以规约项
+            else {
+                var currNts:NonTerminalSymbol = item.nonTerminalSymbol;
+                all_Set.append(currNts.pFollowSet);
+            }
+        } 
+        // 再判断集合中是否存在交集
+        // println("当前项集 ${itemSet.stateId} 不同的follow以及驱动非终结符集合:")
+        // for(nextSet in all_Set) {
+        //     for(tS in nextSet) {
+        //         print("${tS.name} ");
+        //     }
+        //     println();
+        // }
+        var hasSame:Bool = judgeSetHasUnion(all_Set);
+        // if(hasSame) {
+        //     println("当前项集I${itemSet.stateId}有无法消极的冲突");
+        // } else {
+        //     println("当前项集I${itemSet.stateId}不存在通过FOLLOW无法消极的冲突");
+        // }
+        if(hasSame) {
+            return false;
+        }
+    }
+    return true;
+}
+// 判断一群集合中是否两两之间存在交集作为FOLLOW消解冲突的依据
+public func judgeSetHasUnion(tsSet:ArrayList<HashSet<TerminalSymbol>>):Bool{
+    var i:Int64 = 0;
+    while(i<tsSet.size) {
+        var j:Int64 = i + 1;
+        var currTsSet:HashSet<TerminalSymbol> = tsSet[i];
+        while(j<tsSet.size) {
+            var anotherTsSet:HashSet<TerminalSymbol> = tsSet[j];
+            for(tsA in currTsSet) {
+                if(anotherTsSet.contains(tsA)) {
+                    return false;
+                }
+            }
+            j++;
+        }
+        i++;
+    }
     return false;
 }

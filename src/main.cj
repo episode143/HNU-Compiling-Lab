@@ -18,6 +18,11 @@ public var pProductionInfoTable:ArrayList<ProductionInfo> = ArrayList<Production
 main(): Int64 {
     test2();
     test2_1();
+    var isSLR1:Bool = judge_SLR1();
+    if(isSLR1) {
+        println();
+        println("当前文法是SLR1文法");
+    }
     return 0
 }
 public func testTask1(){
