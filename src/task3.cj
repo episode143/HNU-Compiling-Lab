@@ -1,5 +1,6 @@
 package lab2
 import std.collection.*;
+
 public func test_Arithmetic_Operation() {
     create_Arithmetic_Grammar();
     create_Arithmetic_Grammar_LR0_DFA();
@@ -9,48 +10,73 @@ public func test_Arithmetic_Operation() {
     }
     // 创建LR1语法分析表
     create_LR1_Analysis_Table();
+    var testGrammarSequence:ArrayList<String> = ArrayList<String>();
+    testGrammarSequence.append("num");
+    testGrammarSequence.append("*");
+    testGrammarSequence.append("(");
+    testGrammarSequence.append("num");
+    testGrammarSequence.append("+");
+    testGrammarSequence.append("num");
+    testGrammarSequence.append(")");
+    testGrammarSequence.append("+");
+    testGrammarSequence.append("num");
+    testGrammarSequence.append("$");
+    judge_Sentence_LR_Grammar(testGrammarSequence);
+    
 }
 // 创建算数运算的文法
 public func create_Arithmetic_Grammar() {
     // 创建非终结符E'
     var nts_E1:NonTerminalSymbol = NonTerminalSymbol("E'","NONTERMINAL");
     all_NonTerminalSymbol_Set.append(nts_E1);
+    getNTS.put(nts_E1.name,nts_E1);
 
     // 创建非终结符E
     var nts_E:NonTerminalSymbol = NonTerminalSymbol("E","NONTERMINAL");
     all_NonTerminalSymbol_Set.append(nts_E);
+    getNTS.put(nts_E.name,nts_E);
 
     // 创建非终结符T
     var nts_T:NonTerminalSymbol = NonTerminalSymbol("T","NONTERMINAL");
     all_NonTerminalSymbol_Set.append(nts_T);
+    getNTS.put(nts_T.name,nts_T);
 
     // 创建非终结符F
     var nts_F:NonTerminalSymbol = NonTerminalSymbol("F","NONTERMINAL");
     all_NonTerminalSymbol_Set.append(nts_F);
+    getNTS.put(nts_F.name,nts_F);
 
     // 创建终结符 +
     var ts_plus:TerminalSymbol = TerminalSymbol("+","TERMINAL","OPERATOR");
+    getTS.put(ts_plus.name,ts_plus);
 
     // 创建终结符 -
     var ts_subtract:TerminalSymbol = TerminalSymbol("-","TERMINAL","OPERATOR");
+    getTS.put(ts_subtract.name,ts_subtract);
 
     // 创建终结符 *
     var ts_multiply:TerminalSymbol = TerminalSymbol("*","TERMINAL","OPERATOR");
+    getTS.put(ts_multiply.name,ts_multiply);
 
     // 创建终结符 /
     var ts_devide:TerminalSymbol = TerminalSymbol("/","TERMINAL","OPERATOR");
+    getTS.put(ts_devide.name,ts_devide);
 
     // 创建终结符 num
     var ts_num:TerminalSymbol = TerminalSymbol("num","TERMINAL","NUM");
+    getTS.put(ts_num.name,ts_num);
 
     // 创建终结符 (
     var ts_left_bracket:TerminalSymbol = TerminalSymbol("(","TERMINAL","OPERATOR");
+    getTS.put(ts_left_bracket.name,ts_left_bracket);
 
     // 创建终结符 )
     var ts_right_bracket:TerminalSymbol = TerminalSymbol(")","TERMINAL","OPERATOR");
+    getTS.put(ts_right_bracket.name,ts_right_bracket);
 
     // 创建终结符 $
     var ts_shut:TerminalSymbol = TerminalSymbol("$","TERMINAL","SHUT");
+    getTS.put(ts_shut.name,ts_shut);
     nts_E.pFollowSet.put(ts_shut);
 
     // 创建产生式E'->E $
@@ -164,4 +190,61 @@ public func create_Arithmetic_Grammar_LR0_DFA() {
     show_ItemSet(I0);
     exhaustTransition(I0);
     show_All_itemSet();
+}
+
+// LR语法分析的通用代码
+public func judge_Sentence_LR_Grammar(ts_sequence:ArrayList<String>) {
+    // 状态栈存储编号
+    var pStateStack:ArrayList<Int64> = ArrayList<Int64>();
+    pStateStack.append(0);
+    var currentLexeme_pos:Int64 = 0;
+    while(!pStateStack.isEmpty()) {
+        var currSize:Int64 = pStateStack.size;
+        // 求出当前状态
+        var currentState = pStateStack[currSize-1];
+        println("当前状态：${currentState}  当前驱动非终结符：${ts_sequence[currentLexeme_pos]}");
+        if(pActionCellTable[pItemSetTable[currentState]].contains(getTS[ts_sequence[currentLexeme_pos]])) {
+            var indicator:ActionCell = pActionCellTable[pItemSetTable[currentState]][getTS[ts_sequence[currentLexeme_pos]]];
+            println("action： ${indicator.actionType} ${indicator.actionId}");
+            if(indicator.actionType == "s") {
+                pStateStack.append(indicator.actionId);
+                currentLexeme_pos++;
+                println("当前状态栈情况");
+                for(st in pStateStack) {
+                    print("${st} ");
+                }
+                println();
+            }
+            else if(indicator.actionType == "r") {
+                var production:Production = all_Production_Set[indicator.actionId];
+                var times:Int64 = production.pBodySymbolTable.size;
+                while(times!=0) {
+                    times--;
+                    var currTail = pStateStack.size;
+                    if(currTail == 0) {
+                        println("输入字符串有语法错误");
+                        return;
+                    }
+                    pStateStack.remove(currTail-1);
+                }
+                var currTail:Int64 = pStateStack.size;
+                currentState = pStateStack[currTail-1];
+                var nextState:Int64 = pGOTOCellTable[pItemSetTable[currentState]][pItemSetTable[0].pItemTable[indicator.actionId].nonTerminalSymbol].nextStateId;
+                pStateStack.append(nextState);
+                println("当前状态栈情况");
+                for(st in pStateStack) {
+                    print("${st} ");
+                }
+                println();
+            }
+            else if(indicator.actionType == "acc") {
+                println("语法分析完成,语法正确！");
+                return;
+            }
+        }
+        else {
+            println("输入字符串有语法错误");
+            return;
+        }
+    }
 }

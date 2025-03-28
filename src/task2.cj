@@ -461,7 +461,7 @@ public func test2_5(){
     // }
     // 部分ACTION表测试
     println("测试ACTION");
-    println("${pActionCellTable[pItemSetTable[1]][getTS["$"]].actionId}")
+    println("${pActionCellTable[pItemSetTable[1]][getTS["$"]].actionId} TYPE:${pActionCellTable[pItemSetTable[1]][getTS["$"]].actionType}")
     println("${pActionCellTable[pItemSetTable[1]][getTS["+"]].actionId}")
     println();
     println("测试GOTO")
@@ -473,6 +473,8 @@ public func test2_5(){
 }
 // 填写LR语法分析表
 public func create_LR1_Analysis_Table(){
+    // 先得到acc状态
+    var accItemSet:ItemSet = getAcc();
     // 先创建表格
     for(itemSet in pItemSetTable) {
         pActionCellTable.put(itemSet,HashMap<TerminalSymbol, ActionCell>());
@@ -485,7 +487,10 @@ public func create_LR1_Analysis_Table(){
         if(currGS is TerminalSymbol) {
             var currTS:TerminalSymbol = currGS as TerminalSymbol ?? none_TerminalSymbol;
             if(currTS != none_TerminalSymbol) {
-                var new_ac:ActionCell = ActionCell(edge.fromItemSet.stateId,edge.driverSymbol.name,"S",edge.toItemSet.stateId);
+                var new_ac:ActionCell = ActionCell(edge.fromItemSet.stateId,edge.driverSymbol.name,"s",edge.toItemSet.stateId);
+                if(edge.toItemSet.stateId == accItemSet.stateId) {
+                    new_ac.actionType = "acc";
+                }
                 pActionCellTable[edge.fromItemSet].put(currTS,new_ac)
             }
         }
@@ -511,4 +516,28 @@ public func create_LR1_Analysis_Table(){
             }
         }
     }
+}
+// 得到最终acc状态
+public func getAcc():ItemSet {
+    var accItemSet:ItemSet = pItemSetTable[0];
+    for(itemSet in pItemSetTable) {
+        if(itemSet.pItemTable.size == 1 && itemSet.pItemTable[0].dotPosition == itemSet.pItemTable[0].production.pBodySymbolTable.size && itemSet.pItemTable[0].production.pBodySymbolTable[itemSet.pItemTable[0].dotPosition-1].name == "$") {
+            accItemSet = itemSet;
+            return accItemSet;
+        }
+    }
+    return accItemSet;
+}
+public func test2_6() {
+    var testStringArray:ArrayList<String> = ArrayList<String>();
+    testStringArray.append("(");
+    testStringArray.append("id");
+    testStringArray.append("+");
+    testStringArray.append("id");
+    testStringArray.append(")");
+    testStringArray.append("*");
+    testStringArray.append("id");
+    testStringArray.append("$");
+
+    judge_Sentence_LR_Grammar(testStringArray);
 }

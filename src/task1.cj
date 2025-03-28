@@ -1,21 +1,5 @@
 package lab2
 import std.collection.*
-// 三种枚举类
-public var non_s:String = "NONTERMINAL";
-public var ter_s:String = "TERMINAL";
-public var null_s:String = "NULL";
-// 创建终结符null
-public var name_null:String = "null";
-public var lexeme_null:String = "null";
-public var ts_null = TerminalSymbol(name_null,null_s,lexeme_null);
-// 当option为NONE的时候返回的值
-public var none_s:String = "NONE";
-public var none_NonTerminalSymbol:NonTerminalSymbol = NonTerminalSymbol(none_s,none_s);
-public var none_TerminalSymbol:TerminalSymbol = TerminalSymbol(none_s,none_s,none_s);
-// 所有的非终结符集合
-public var all_NonTerminalSymbol_Set:ArrayList<NonTerminalSymbol> = ArrayList<NonTerminalSymbol>();
-// 所有的产生式集合
-public var all_Production_Set:ArrayList<Production> = ArrayList<Production>();
 // 展示所有非终结符以及其产生式集合
 public func show_All_nts_production(){
     for(nts in all_NonTerminalSymbol_Set) {
@@ -39,12 +23,12 @@ public func get_Production_FIRST(production:Production) {
         if(currGrammarSymbol is TerminalSymbol) {
             nullStand = false;
             var insert_Symbol:TerminalSymbol = currGrammarSymbol as TerminalSymbol ?? none_TerminalSymbol;
-            if(insert_Symbol.name != "NONE") {
+            if(insert_Symbol != none_TerminalSymbol) {
                 production.pFirstSet.put(insert_Symbol);
             }
         } else {
             var insert_Symbol:NonTerminalSymbol = currGrammarSymbol as NonTerminalSymbol ?? none_NonTerminalSymbol;
-            if(insert_Symbol.name != "NONE") {
+            if(insert_Symbol != none_NonTerminalSymbol) {
                 production.pFirstSet.putAll(insert_Symbol.pFirstSet);
                 production.pFirstSet.remove(ts_null);
                 if(!insert_Symbol.pFirstSet.contains(ts_null)) {
@@ -109,7 +93,7 @@ public func get_All_NFS_FIRST(){
                     }
                 } else {
                     var insert_ts:TerminalSymbol = grammarSymbol as TerminalSymbol ?? none_TerminalSymbol;
-                    if(insert_ts.name != "NONE") {
+                    if(insert_ts != none_TerminalSymbol) {
                         nts.pFirstSet.put(insert_ts);
                     }
                 }
@@ -151,7 +135,7 @@ public func get_All_NTS_FOLLOW(){
             var grammerSymbol:GrammarSymbol = production.pBodySymbolTable[i];
             if(grammerSymbol is NonTerminalSymbol) {
                 var temp_nts = grammerSymbol as NonTerminalSymbol ?? none_NonTerminalSymbol;
-                if(temp_nts.name != "NONE") {
+                if(temp_nts != none_NonTerminalSymbol) {
                     // FOLLOW求解不可依赖自己
                     if(temp_nts != nts){
                         temp_nts.pDependentSetInFollow.put(nts);
@@ -165,7 +149,7 @@ public func get_All_NTS_FOLLOW(){
                 var curr_gs:GrammarSymbol = production.pBodySymbolTable[i];
                 if(curr_gs is NonTerminalSymbol) {
                     var temp_nts = curr_gs as NonTerminalSymbol ?? none_NonTerminalSymbol;
-                    if(temp_nts.name != "NONE") {
+                    if(temp_nts != none_NonTerminalSymbol) {
                         var k:Int64 = i+1;
                         while(k<=j) {
                             var insert_k_gs:GrammarSymbol = production.pBodySymbolTable[k];
