@@ -97,6 +97,7 @@ public func test2(){
     nts_E1.pProductionTable.append(production_0);
     nts_E1.numOfProduction = 1;
     all_Production_Set.append(production_0);
+    relativeId.append(0);
 
     // 创建产生式 E->E + T
     var production_1_id:Int64 = 1;
@@ -111,6 +112,7 @@ public func test2(){
     nts_E.pProductionTable.append(production_1);
     nts_E.numOfProduction = 2;
     all_Production_Set.append(production_1);
+    relativeId.append(1);
     
     // 创建产生式 E->T
     var production_2_id:Int64 = 2;
@@ -123,6 +125,7 @@ public func test2(){
     nts_E.pProductionTable.append(production_2);
     nts_E.numOfProduction = 2;
     all_Production_Set.append(production_2);
+    relativeId.append(1);
 
     // 创建产生式 T->T * F
     var production_3_id:Int64 = 3;
@@ -137,6 +140,7 @@ public func test2(){
     nts_T.pProductionTable.append(production_3);
     nts_T.numOfProduction = 2;
     all_Production_Set.append(production_3);
+    relativeId.append(2);
 
     // 创建产生式 T->F
     var production_4_id:Int64 = 4;
@@ -149,6 +153,7 @@ public func test2(){
     nts_T.pProductionTable.append(production_4);
     nts_T.numOfProduction = 2;
     all_Production_Set.append(production_4);
+    relativeId.append(2);
 
     // 创建产生式 F->( E )
     var production_5_id:Int64 = 5;
@@ -163,6 +168,7 @@ public func test2(){
     nts_F.pProductionTable.append(production_5);
     nts_F.numOfProduction = 2;
     all_Production_Set.append(production_5);
+    relativeId.append(3);
 
     // 创建产生式 F->id
     var production_6_id:Int64 = 6;
@@ -175,6 +181,8 @@ public func test2(){
     nts_F.pProductionTable.append(production_6);
     nts_F.numOfProduction = 2;
     all_Production_Set.append(production_6);
+    relativeId.append(3);
+    
     // 先求解出所有非终结符的FIRST
     get_All_NFS_FIRST();
     // 展示所有终结符的FIRST

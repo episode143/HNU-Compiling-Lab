@@ -32,3 +32,5 @@ public var none_TerminalSymbol:TerminalSymbol = TerminalSymbol(none_s,none_s,non
 public var all_NonTerminalSymbol_Set:ArrayList<NonTerminalSymbol> = ArrayList<NonTerminalSymbol>();
 // 所有的产生式集合
 public var all_Production_Set:ArrayList<Production> = ArrayList<Production>();
+// 所有产生式对应的非终结符的编号
+public var relativeId:ArrayList<Int64> = ArrayList<Int64>();

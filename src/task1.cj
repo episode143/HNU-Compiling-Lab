@@ -366,6 +366,7 @@ public func test1(){
     nts_E.pProductionTable.append(production_1);
     nts_E.numOfProduction = 1;
     all_Production_Set.append(production_1);
+    relativeId.append(0);
 
     // 创建产生式 E'->+ T E'
     var production_2_id:Int64 = 2;
@@ -380,6 +381,7 @@ public func test1(){
     nts_E1.pProductionTable.append(production_2);
     nts_E1.numOfProduction = 2;
     all_Production_Set.append(production_2);
+    relativeId.append(1);
     
     // 创建产生式 E'-> null
     var production_3_id:Int64 = 3;
@@ -392,6 +394,7 @@ public func test1(){
     nts_E1.pProductionTable.append(production_3);
     nts_E1.numOfProduction = 2;
     all_Production_Set.append(production_3);
+    relativeId.append(1);
     
     // 创建产生式 T->F T'
     var production_4_id:Int64 = 4;
@@ -405,6 +408,7 @@ public func test1(){
     nts_T.pProductionTable.append(production_4);
     nts_T.numOfProduction = 1;
     all_Production_Set.append(production_4);
+    relativeId.append(2)
     
     // 创建产生式 T'->* F T'
     var production_5_id:Int64 = 5;
@@ -419,6 +423,7 @@ public func test1(){
     nts_T1.pProductionTable.append(production_5);
     nts_T1.numOfProduction = 2;
     all_Production_Set.append(production_5);
+    relativeId.append(3);
     
     // 创建产生式 T'->null
     var production_6_id:Int64 = 6;
@@ -431,6 +436,7 @@ public func test1(){
     nts_T1.pProductionTable.append(production_6);
     nts_T1.numOfProduction = 2;
     all_Production_Set.append(production_6);
+    relativeId.append(3);
     
     // 创建产生式 F->( E )
     var production_7_id:Int64 = 7;
@@ -445,6 +451,7 @@ public func test1(){
     nts_F.pProductionTable.append(production_7);
     nts_F.numOfProduction = 2;
     all_Production_Set.append(production_7);
+    relativeId.append(4);
     
     // 创建产生式 F->id
     var production_8_id:Int64 = 8;
@@ -457,5 +464,6 @@ public func test1(){
     nts_F.pProductionTable.append(production_8);
     nts_F.numOfProduction = 2;
     all_Production_Set.append(production_8);
+    relativeId.append(4);
     
 }
