@@ -176,15 +176,15 @@ public func create_follow_circle_case(){
 
     
     // 先求解出所有非终结符的FIRST
-    get_NFS_FIRST();
+    get_All_NFS_FIRST();
     // 展示所有终结符的FIRST
-    show_NFS_FIRST();
+    show_All_NFS_FIRST();
     // 再求解出所有产生式的FIRST
     get_All_Production_FIRST();
     // 展示所有产生式的FIRST
-    show_Production_FIRST();
+    show_All_Production_FIRST();
     // 求出所有非终结符的FOLLOW
-    get_NFS_FOLLOW();
+    get_All_NTS_FOLLOW();
     // 展示所有非终结符的FOLLOW
-    show_NFS_FOLLOW();
+    show_All_NTS_FOLLOW();
 }

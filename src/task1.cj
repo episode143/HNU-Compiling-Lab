@@ -17,7 +17,7 @@ public var all_NonTerminalSymbol_Set:ArrayList<NonTerminalSymbol> = ArrayList<No
 // 所有的产生式集合
 public var all_Production_Set:ArrayList<Production> = ArrayList<Production>();
 // 展示所有非终结符以及其产生式集合
-public func show_all_nts_production(){
+public func show_All_nts_production(){
     for(nts in all_NonTerminalSymbol_Set) {
         println("name: ${nts.name} ");
         for(p in nts.pProductionTable) {
@@ -64,7 +64,7 @@ public func get_All_Production_FIRST(){
     }
 }
 // 展示所有产生式的FIRST
-public func show_Production_FIRST(){
+public func show_All_Production_FIRST(){
     for(production in all_Production_Set) {
         print("PRODUCTION: ");
         for(grammar in production.pBodySymbolTable) {
@@ -79,7 +79,7 @@ public func show_Production_FIRST(){
     }
 }
 // 求出所有的非终结符的FIRST
-public func get_NFS_FIRST(){
+public func get_All_NFS_FIRST(){
     var task_table:HashMap<NonTerminalSymbol, HashSet<NonTerminalSymbol>> = HashMap<NonTerminalSymbol, HashSet<NonTerminalSymbol>>();
     for(nfs in all_NonTerminalSymbol_Set) {
         task_table.put(nfs,HashSet<NonTerminalSymbol>());
@@ -121,7 +121,7 @@ public func get_NFS_FIRST(){
     }
 }
 // 展示所有非终结符的FIRST函数
-public func show_NFS_FIRST(){
+public func show_All_NFS_FIRST(){
     for(nfs in all_NonTerminalSymbol_Set) {
         print("name: ${nfs.name} FIRST: {");
         for(ts in nfs.pFirstSet) {
@@ -143,7 +143,7 @@ public func FIRST(grammerSymbol:GrammarSymbol):HashSet<TerminalSymbol> {
     }
 }
 // 求出所有非终结符的FOLLOW函数
-public func get_NFS_FOLLOW(){
+public func get_All_NTS_FOLLOW(){
     // 仅仅使用FIRST得到部分以及依赖的FOLLOW
     for(nts in all_NonTerminalSymbol_Set) {
         for(production in nts.pProductionTable) {
@@ -276,7 +276,7 @@ public func get_NFS_FOLLOW(){
     }
 }
 // 展示所有非终结符的FOLLOW函数
-public func show_NFS_FOLLOW() {
+public func show_All_NTS_FOLLOW() {
     for(nts in all_NonTerminalSymbol_Set) {
         print("name: ${nts.name} FOLLOW: {");
         for(follow_symbol in nts.pFollowSet) {

@@ -15,6 +15,12 @@ public class Production<:Equatable<Production>{
         this.pBodySymbolTable = pBodySymbolTable;
         this.pFirstSet = pFirstSet;
     }
+    public init(productionId:Int64 ,bodySize:Int64 ){
+        this.productionId = productionId;
+        this.bodySize = bodySize;
+        this.pBodySymbolTable = ArrayList<GrammarSymbol>();
+        this.pFirstSet = HashSet<TerminalSymbol>();
+    }
     public operator func==(another:Production) {
         return this.productionId == another.productionId;
     }

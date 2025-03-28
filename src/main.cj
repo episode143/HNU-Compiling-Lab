@@ -18,19 +18,19 @@ public var pGOTOCellTable:HashMap<ItemSet, HashMap<NonTerminalSymbol, GotoCell>>
 public var pProductionInfoTable:ArrayList<ProductionInfo> = ArrayList<ProductionInfo>();
 
 main(): Int64 {
-    create_follow_circle_case();
+    test_Arithmetic_Operation();
     return 0
 }
 // 测试第一题
 public func testTask1(){
     test1();
     //show_all_nts_production();
-    get_NFS_FIRST();
-    show_NFS_FIRST();
+    get_All_NFS_FIRST();
+    show_All_NFS_FIRST();
     get_All_Production_FIRST();
-    show_Production_FIRST();
-    get_NFS_FOLLOW();
-    show_NFS_FOLLOW();
+    show_All_Production_FIRST();
+    get_All_NTS_FOLLOW();
+    show_All_NTS_FOLLOW();
 }
 // 测试第二题
 public func testTask2(){
