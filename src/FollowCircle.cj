@@ -176,9 +176,9 @@ public func create_follow_circle_case(){
 
     
     // 先求解出所有非终结符的FIRST
-    get_All_NFS_FIRST();
+    get_All_NTS_FIRST();
     // 展示所有终结符的FIRST
-    show_All_NFS_FIRST();
+    show_All_NTS_FIRST();
     // 再求解出所有产生式的FIRST
     get_All_Production_FIRST();
     // 展示所有产生式的FIRST

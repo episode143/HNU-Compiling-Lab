@@ -148,8 +148,8 @@ public func create_Arithmetic_Grammar() {
     
     // 展示所有非终结符的FIRST
     println("展示所有非终结符的FIRST");
-    get_All_NFS_FIRST();
-    show_All_NFS_FIRST();
+    get_All_NTS_FIRST();
+    show_All_NTS_FIRST();
     println();
     // 展示所有产生式的FIRST
     println("展示所有产生式的FIRST");
@@ -633,10 +633,10 @@ public func create_TINY() {
     all_Production_Set.append(production_29)
     relativeId.append(15);
 
-    get_All_NFS_FIRST();
+    get_All_NTS_FIRST();
     println("展示所有NTSFIRST")
     println();
-    show_All_NFS_FIRST();
+    show_All_NTS_FIRST();
     get_All_Production_FIRST();
     println("展示所有产生式的FIRST");
     println();
@@ -667,6 +667,7 @@ public func create_TINY_LR0_DFA() {
     println("当前有产生式${all_Production_Set.size}个");
     println()
 }
+// TINY测试样例1
 public func test_TINY1() {
     var testGrammarSequence:ArrayList<String> = ArrayList<String>();
     testGrammarSequence.append("repeat");
@@ -682,6 +683,7 @@ public func test_TINY1() {
     testGrammarSequence.append("$");
     judge_Sentence_LR_Grammar(testGrammarSequence);
 }
+// TINY测试样例2
 public func test_TINY2() {
     var testGrammarSequence:ArrayList<String> = ArrayList<String>();
     testGrammarSequence.append("read");
@@ -695,6 +697,44 @@ public func test_TINY2() {
     testGrammarSequence.append(";");
     testGrammarSequence.append("write");
     testGrammarSequence.append("identifier");
+    testGrammarSequence.append("$");
+    judge_Sentence_LR_Grammar(testGrammarSequence);
+}
+// TINY测试样例3
+public func test_TINY3() {
+    var testGrammarSequence:ArrayList<String> = ArrayList<String>();
+    testGrammarSequence.append("read"); // read
+    testGrammarSequence.append("identifier"); // x
+    testGrammarSequence.append(";"); // ;
+    testGrammarSequence.append("if"); // if
+    testGrammarSequence.append("Number"); // 0
+    testGrammarSequence.append("<"); // <
+    testGrammarSequence.append("identifier"); // x
+    testGrammarSequence.append("then"); // then
+    testGrammarSequence.append("identifier"); // fact
+    testGrammarSequence.append(":="); // :=
+    testGrammarSequence.append("Number"); // 1
+    testGrammarSequence.append(";"); // ;
+    testGrammarSequence.append("repeat"); // repeat
+    testGrammarSequence.append("identifier"); // fact
+    testGrammarSequence.append(":="); // :=
+    testGrammarSequence.append("identifier"); // fact
+    testGrammarSequence.append("*"); // *
+    testGrammarSequence.append("identifier"); // x
+    testGrammarSequence.append(";"); // ;
+    testGrammarSequence.append("identifier"); // x
+    testGrammarSequence.append(":="); // :=
+    testGrammarSequence.append("identifier"); // x
+    testGrammarSequence.append("-"); // -
+    testGrammarSequence.append("Number"); // 1
+    testGrammarSequence.append("until"); //until
+    testGrammarSequence.append("identifier"); // x
+    testGrammarSequence.append("="); // =
+    testGrammarSequence.append("Number"); // 0
+    testGrammarSequence.append(";"); // ;
+    testGrammarSequence.append("write"); // write
+    testGrammarSequence.append("identifier"); //  fact
+    testGrammarSequence.append("end"); // end
     testGrammarSequence.append("$");
     judge_Sentence_LR_Grammar(testGrammarSequence);
 }

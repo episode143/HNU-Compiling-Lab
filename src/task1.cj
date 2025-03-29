@@ -63,7 +63,7 @@ public func show_All_Production_FIRST(){
     }
 }
 // 求出所有的非终结符的FIRST
-public func get_All_NFS_FIRST(){
+public func get_All_NTS_FIRST(){
     var task_table:HashMap<NonTerminalSymbol, HashSet<NonTerminalSymbol>> = HashMap<NonTerminalSymbol, HashSet<NonTerminalSymbol>>();
     for(nfs in all_NonTerminalSymbol_Set) {
         task_table.put(nfs,HashSet<NonTerminalSymbol>());
@@ -105,7 +105,7 @@ public func get_All_NFS_FIRST(){
     }
 }
 // 展示所有非终结符的FIRST函数
-public func show_All_NFS_FIRST(){
+public func show_All_NTS_FIRST(){
     for(nfs in all_NonTerminalSymbol_Set) {
         print("name: ${nfs.name} FIRST: {");
         for(ts in nfs.pFirstSet) {
