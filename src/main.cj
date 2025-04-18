@@ -1,33 +1,34 @@
-package lab2
+package comprehensiveLab
+import comprehensiveLab.lab3.*
+import comprehensiveLab.lab4.*
 import std.collection.*
+import std.io.SeekPosition
+import std.fs.*
 main(): Int64 {
-    testTask3();
+    getCode();
     return 0
 }
-// 测试第一题
-public func testTask1(){
-    test1();
-    //show_all_nts_production();
-    get_All_NTS_FIRST();
-    show_All_NTS_FIRST();
-    get_All_Production_FIRST();
-    show_All_Production_FIRST();
-    get_All_NTS_FOLLOW();
-    show_All_NTS_FOLLOW();
-}
-// 测试第二题
-public func testTask2(){
-    test2();
-    test2_1();
-    test2_4();
-    test2_5();
-    test2_6();
-}
-// 测试第三题
-public func testTask3(){
-    create_TINY();
-    create_TINY_LR0_DFA();
-    //test_TINY1();
-    //test_TINY2();
-    test_TINY3();
+public func getCode(){
+    // 读取文件内容
+    var fileContent:String = readFromFile("./Sample.tny");
+    // 测试词法分析器
+    var ts_sequence:ArrayList<object> =lexicalAnalysis(fileContent);
+    ts_sequence.append(object("$","TERMINAL"));
+    var stringList:ArrayList<String> = ArrayList<String>();
+    for(ts in ts_sequence) {
+        stringList.append(ts.grammarSymbol.name);
+    }
+    stringList.append("$");
+    for(s in ts_sequence) {
+        println("${s.grammarSymbol.name} ");
+        if(s.grammarSymbol.name == "Number") {
+            println("the value:     ${s.value}")
+        } else if(s.grammarSymbol.name == "identifier") {
+            println("the id:        ^${s.identify}")
+        }
+    }
+    grammaticalAnalysis(stringList);
+    // 测试生成中间代码
+    println("测试生成中间代码");
+    translate_to_TMCODE(ts_sequence,"Sample.tm");
 }

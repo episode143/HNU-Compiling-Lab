@@ -538,11 +538,9 @@ public func getAcc():ItemSet {
 }
 public func test2_6() {
     var testStringArray:ArrayList<String> = ArrayList<String>();
-    testStringArray.append("(");
     testStringArray.append("id");
     testStringArray.append("+");
     testStringArray.append("id");
-    testStringArray.append(")");
     testStringArray.append("*");
     testStringArray.append("id");
     testStringArray.append("$");

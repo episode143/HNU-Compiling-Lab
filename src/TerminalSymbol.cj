@@ -18,3 +18,4 @@ public class TerminalSymbol<: GrammarSymbol & Hashable &Equatable<TerminalSymbol
         return this.symbolType != another.symbolType || this.name != another.name;
     }
 }
+

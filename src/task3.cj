@@ -190,7 +190,7 @@ public func test_Arithmetic_Operation() {
     testGrammarSequence.append("num");
     testGrammarSequence.append("*");
     testGrammarSequence.append("(");
-    testGrammarSequence.append("num");
+    testGrammarSequence.append("+");
     testGrammarSequence.append("+");
     testGrammarSequence.append("num");
     testGrammarSequence.append(")");
@@ -202,11 +202,17 @@ public func test_Arithmetic_Operation() {
 }
 // LR语法分析的通用代码
 public func judge_Sentence_LR_Grammar(ts_sequence:ArrayList<String>) {
+    var step:Int64 = 1;
+    // 记录使用的规约情况（产生式编号）
+    var use_p:ArrayList<Int64> = ArrayList<Int64>();
     // 状态栈存储编号
     var pStateStack:ArrayList<Int64> = ArrayList<Int64>();
     pStateStack.append(0);
     var currentLexeme_pos:Int64 = 0;
     while(!pStateStack.isEmpty()) {
+        println();
+        println("STEP: ${step}")
+        step++;
         var currSize:Int64 = pStateStack.size;
         // 求出当前状态
         var currentState = pStateStack[currSize-1];
@@ -226,6 +232,7 @@ public func judge_Sentence_LR_Grammar(ts_sequence:ArrayList<String>) {
             else if(indicator.actionType == "r") {
                 var production:Production = all_Production_Set[indicator.actionId];
                 println("当前规约编号：${indicator.actionId}");
+                use_p.append(indicator.actionId);
                 println();
                 var times:Int64 = production.pBodySymbolTable.size;
                 while(times!=0) {
@@ -248,6 +255,16 @@ public func judge_Sentence_LR_Grammar(ts_sequence:ArrayList<String>) {
                 println();
             }
             else if(indicator.actionType == "acc") {
+                println("规约过程为")
+                for(st in use_p) {
+                    for(gs in all_Production_Set[st].pBodySymbolTable) {
+                        print(gs.name);
+                        print(" ");
+                    }
+                    print("  ->  ");
+                    print(all_NonTerminalSymbol_Set[relativeId[st]].name);
+                    println();
+                }
                 println("语法分析完成,语法正确！");
                 return;
             }
